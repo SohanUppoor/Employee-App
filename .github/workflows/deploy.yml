@@ -33,4 +33,4 @@ jobs:
 
     - name: Upload JAR to S3
       run: |
-        aws s3 cp target/employeeapp-0.0.1-SNAPSHOT.jar s3://${{ secrets.ARTIFACT_BUCKET_NAME }}/builds/employeeapp.jar
+        aws s3 cp backend/target/employeeapp-0.0.1-SNAPSHOT.jar s3://${{ secrets.ARTIFACT_BUCKET_NAME }}/builds/employeeapp.jar
