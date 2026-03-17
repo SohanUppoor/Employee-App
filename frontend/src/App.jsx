@@ -6,13 +6,13 @@ function App() {
   const [email, setEmail] = useState("");
 
   useEffect(() => {
-    fetch("/employees")
+    fetch("/api/employees")
       .then(res => res.json())
       .then(data => setEmployees(data));
   }, []);
 
   const addEmployee = async () => {
-    await fetch("employees", {
+    await fetch("/api/employees", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
