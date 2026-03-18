@@ -1,0 +1,63 @@
+name: Build and Push Docker Images to ECR
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: us-east-1
+  ECR_FRONTEND_REPO: employee-frontend
+  ECR_BACKEND_REPO: employee-backend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # 1️⃣ Checkout
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 2️⃣ Configure AWS
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    # 3️⃣ Login to ECR
+    - name: Login to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v2
+
+    # 4️⃣ Build & Push Backend Image
+    - name: Build and push backend image
+      run: |
+        docker build -t $ECR_BACKEND_REPO ./backend
+        docker tag $ECR_BACKEND_REPO:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_BACKEND_REPO:latest
+        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_BACKEND_REPO:latest
+
+    # 5️⃣ Build & Push Frontend Image
+    - name: Build and push frontend image
+      run: |
+        docker build -t $ECR_FRONTEND_REPO ./frontend
+        docker tag $ECR_FRONTEND_REPO:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_FRONTEND_REPO:latest
+        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_FRONTEND_REPO:latest
+
+    # 6️⃣ Force ECS Deployment (Backend)
+    - name: Deploy backend
+      run: |
+        aws ecs update-service \
+          --cluster employee-app-cluster \
+          --service employee-backend-service \
+          --force-new-deployment
+
+    # 7️⃣ Force ECS Deployment (Frontend)
+    - name: Deploy frontend
+      run: |
+        aws ecs update-service \
+          --cluster employee-app-cluster \
+          --service employee-frontend-service \
+          --force-new-deployment
