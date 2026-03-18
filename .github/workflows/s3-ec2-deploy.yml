@@ -1,10 +1,8 @@
-name: Build and Upload Employee App
+name: Build and Upload Employee App to s3
 
 on:
-  push:
-    branches:
-      - main
-
+  workflow_dispatch:
+  
 jobs:
   build:
     runs-on: ubuntu-latest
