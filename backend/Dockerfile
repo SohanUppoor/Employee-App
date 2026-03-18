@@ -27,9 +27,9 @@ COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8081
 
 # Environment variables (will be overridden in ECS)
-ENV DB_URL=jdbc:mysql://localhost:3306/employee_db
+ENV DB_URL=jdbc:mysql://employee-db.ck1g4kukuf65.us-east-1.rds.amazonaws.com:3306/employeedb
 ENV DB_USERNAME=admin
-ENV DB_PASSWORD=TBC
+ENV DB_PASSWORD=Employee123
 
 # Run application
 ENTRYPOINT ["java", "-jar", "app.jar"]
