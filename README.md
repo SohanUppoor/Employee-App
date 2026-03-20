@@ -1,178 +1,277 @@
-# Employee Management Application
+# 🚀 Employee Management Application – Full Stack + DevOps (AWS, Docker, ECS)
 
-## Overview
+## 📌 Overview
 
-This project is a **full-stack Employee Management Application** built using:
+This project is a **full-stack Employee Management Application** built with modern cloud and DevOps practices.
 
-* React (Frontend)
-* Spring Boot (Backend)
-* MySQL Database (AWS RDS)
+It demonstrates the **complete software lifecycle**:
 
-The application allows users to **create, view employee records** through a web interface.
+```text
+Development → Containerization → CI/CD → Cloud Deployment → Scaling
+```
 
-The backend APIs are deployed on AWS EC2 instances and the database is hosted on **AWS RDS**.
+The project also showcases the **evolution from a traditional EC2-based deployment to a modern containerized architecture using Docker and AWS ECS**.
 
 ---
 
-## Tech Stack
+## 🏗️ Tech Stack
 
-### Frontend
+### 💻 Application
 
-* React
-* JavaScript
-* Axios
-* HTML / CSS
+* **Frontend**: React (Vite)
+* **Backend**: Spring Boot (Java 17)
+* **Database**: MySQL (AWS RDS)
 
-### Backend
+### ⚙️ DevOps & Cloud
 
-* Spring Boot
-* Java
-* REST APIs
-* Maven
-
-### Database
-
-* MySQL
-* AWS RDS
-
-### DevOps
-
+* Docker (multi-container architecture)
 * GitHub Actions (CI/CD)
-* Terraform (Infrastructure provisioning)
-* AWS EC2
-* AWS ALB
-* AWS S3 (artifact storage)
+* Amazon ECS (Fargate)
+* Amazon ECR (container registry)
+* AWS ALB (Load Balancer)
+* Terraform (Infrastructure as Code)
+* AWS EC2 (legacy deployment)
 
 ---
 
-## Application Features
+## 🧩 Architecture (Current – Containerized)
+
+```text
+User
+  ↓
+Application Load Balancer (Public)
+  ↓
+-----------------------------------------
+|                                       |
+Frontend (NGINX Container)         Backend (Spring Boot Container)
+Port 80                            Port 8081
+  ↓                                       ↓
+            MySQL Database (AWS RDS - Private Subnet)
+```
+
+---
+
+## 🔄 Deployment Evolution
+
+This project demonstrates two deployment approaches:
+
+---
+
+### 🧱 1. Traditional Deployment (EC2 + JAR) – Legacy
+
+* Backend packaged as JAR
+* Uploaded to Amazon S3 via CI/CD
+* EC2 instances (Auto Scaling Group) download and run JAR
+* Managed using Terraform
+
+> ⚠️ This approach is retained for comparison and learning purposes.
+
+---
+
+### 🐳 2. Modern Deployment (Docker + ECS) – Primary ✅
+
+* Application containerized using Docker
+* Separate images for frontend and backend
+* Images pushed to Amazon ECR
+* Deployed using Amazon ECS (Fargate)
+* Traffic routed via Application Load Balancer
+
+> ✅ This is the **recommended and actively used architecture**
+
+---
+
+## ⚙️ Application Features
 
 * Add new employees
 * View employee list
-* REST API integration between frontend and backend
-* Database persistence using MySQL
+* REST API communication between frontend and backend
+* Persistent storage using MySQL (RDS)
 
 ---
 
-## Application Architecture
+## 🐳 Containerization Strategy
 
-User → React Frontend → Spring Boot API → MySQL (RDS)
+### Frontend
 
-### Flow
+* Built using React (Vite)
+* Served via NGINX
+* Port: `80`
 
-1. User accesses the application via browser.
-2. React frontend sends API requests to Spring Boot backend.
-3. Backend processes requests and interacts with the MySQL database.
-4. Data is returned to the frontend and displayed to the user.
+### Backend
+
+* Spring Boot application
+* REST APIs
+* Port: `8081`
 
 ---
 
-## Project Structure
+## 🔀 Request Flow
 
+```text
+1. User opens application (via ALB)
+2. Frontend loads from ECS (NGINX container)
+3. Frontend calls /api endpoints
+4. ALB routes /api/* → Backend service
+5. Backend interacts with RDS database
+6. Response returned to frontend
 ```
+
+---
+
+## 🔄 CI/CD Pipelines (GitHub Actions)
+
+### 🐳 Container Pipeline (Primary)
+
+1. Code pushed to GitHub
+2. Docker images built:
+
+   * frontend
+   * backend
+3. Images pushed to Amazon ECR
+4. ECS services pull latest images and deploy
+
+---
+
+### 🧱 EC2 Pipeline (Legacy)
+
+1. Frontend built and bundled into backend
+2. Backend JAR created using Maven
+3. JAR uploaded to Amazon S3
+4. EC2 instances download and run application
+
+---
+
+## 📁 Project Structure
+
+```text
 employee-app/
+│
+├── frontend/
+│   ├── src/
+│   ├── nginx.conf
+│   └── Dockerfile
 │
 ├── backend/
 │   ├── src/main/java
 │   ├── src/main/resources
-│   └── pom.xml
+│   └── Dockerfile
 │
-├── frontend/
-│   ├── src/
-│   ├── public/
-│   └── package.json
+├── .github/workflows/
+│   ├── deploy-ecr.yml      # ECS deployment
+│   └── deploy-s3.yml       # EC2 (legacy)
 │
 └── README.md
 ```
 
 ---
 
-## Database Configuration
+## 🔐 Configuration & Secrets
 
-The backend connects to a **MySQL database hosted on AWS RDS**.
+Application uses environment variables:
 
-Example configuration in `application.properties`:
-
-```
-spring.datasource.url=jdbc:mysql://<rds-endpoint>:3306/employeeapp
-spring.datasource.username=<username>
-spring.datasource.password=<password>
-
-spring.jpa.hibernate.ddl-auto=update
+```text
+DB_URL
+DB_USERNAME
+DB_PASSWORD
 ```
 
----
+Configured via:
 
-## CI/CD Pipeline
-
-CI/CD is implemented using **GitHub Actions**.
-
-Pipeline workflow:
-
-1. Developer pushes code to GitHub
-2. GitHub Actions builds the application
-3. Frontend is built and copied to Spring Boot static directory
-4. Backend JAR is generated
-5. Artifact is uploaded to S3
-6. EC2 instances download and run the application
+* ECS Task Definitions
+* GitHub Secrets (CI/CD)
 
 ---
 
-## Deployment Architecture
-
-Application is deployed using AWS infrastructure created with Terraform.
-
-Components include:
-
-* Application Load Balancer
-* Auto Scaling Group
-* EC2 instances running the application
-* RDS MySQL database
-
-The ALB distributes incoming traffic to EC2 instances running the Spring Boot application.
-
----
-
-## Running Locally
+## 🧪 Running Locally
 
 ### Backend
 
-```
+```bash
 cd backend
 mvn spring-boot:run
 ```
 
 ### Frontend
 
-```
+```bash
 cd frontend
 npm install
-npm start
+npm run dev
 ```
-
-## API Example
-
-Get all employees
-
-```
-GET /api/employees
-```
-
-Create employee
-
-```
-POST /api/employees
-```
-
-## Future Improvements
-
-Potential enhancements include:
-
-* Docker containerization
-* Monitoring with CloudWatch
 
 ---
 
-## Author
+### Docker (Optional)
 
-Developed as part of a **Cloud / DevOps portfolio project** demonstrating full-stack application development with automated CI/CD deployment to AWS.
+```bash
+docker build -t employee-frontend ./frontend
+docker build -t employee-backend ./backend
+
+docker run -p 80:80 employee-frontend
+docker run -p 8081:8081 employee-backend
+```
+
+---
+
+## 🌐 API Endpoints
+
+### Get Employees
+
+```text
+GET /api/employees
+```
+
+### Create Employee
+
+```text
+POST /api/employees
+```
+
+---
+
+## 🔐 Security Considerations
+
+* RDS deployed in private subnets
+* Backend not directly exposed to internet
+* Access controlled via Security Groups
+* Traffic routed only through ALB
+
+---
+
+## 📈 Key Highlights
+
+* End-to-end full-stack application
+* Containerized using Docker
+* Deployed on AWS ECS (Fargate)
+* CI/CD implemented using GitHub Actions
+* Infrastructure managed using Terraform
+* Demonstrates migration from EC2 → ECS
+
+---
+
+## 🔮 Future Enhancements
+
+* Blue/Green deployments
+
+---
+
+## 👨‍💻 Author
+
+Developed as part of a **Cloud & DevOps portfolio project** demonstrating:
+
+* Full-stack development
+* Containerization (Docker)
+* CI/CD pipelines
+* Cloud-native deployment (AWS ECS)
+
+---
+
+## ⭐ Final Note
+
+This project reflects **real-world DevOps practices**, covering:
+
+```text
+Code → Build → Docker → ECR → ECS → ALB → User
+```
+
+It highlights both **foundational concepts (EC2)** and **modern cloud-native architecture (ECS)**.
