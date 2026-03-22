@@ -36,19 +36,7 @@ The project also showcases the **evolution from a traditional EC2-based deployme
 
 ## 🧩 Architecture (Current – Containerized)
 
-```text
-User
-  ↓
-Application Load Balancer (Public)
-  ↓
------------------------------------------
-|                                       |
-Frontend (NGINX Container)         Backend (Spring Boot Container)
-Port 80                            Port 8081
-  ↓                                       ↓
-            MySQL Database (AWS RDS - Private Subnet)
-```
-
+![Architecture](devops_cicd_pipeline.png)
 ---
 
 ## 🔄 Deployment Evolution
